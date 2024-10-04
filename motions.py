@@ -33,20 +33,26 @@ class motion_executioner(Node):
         self.laser_initialized = False
         
         # Creating a publisher to send velocity commands
-        self.vel_publisher = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.vel_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
         
         # Loggers
         self.imu_logger = Logger('imu_content_' + str(motion_types[motion_type]) + '.csv', headers=["acc_x", "acc_y", "angular_z", "stamp"])
         self.odom_logger = Logger('odom_content_' + str(motion_types[motion_type]) + '.csv', headers=["x", "y", "th", "stamp"])
-        self.laser_logger = Logger('laser_content_' + str(motion_types[motion_type]) + '.csv', headers=["ranges", "angle_increment", "stamp"])
-        
+        self.laser_logger = Logger('laser_content_' + str(motion_types[motion_type]) + '.csv', headers=["angle_increment", "stamp"])
+        self.laser_range_logger = Logger('laser_ranges_content_' + str(motion_types[motion_type]) + '.csv', headers=["ranges"])
         # Creating QoS profile
-        qos = QoSProfile(depth=10)
+        qos = QoSProfile(
+            history=1,
+            depth=10,
+            reliability=2,
+            durability=2,
+        )
         
         # Subscriptions to sensor topics
-        self.create_subscription(Imu, 'imu', self.imu_callback, qos)
-        self.create_subscription(Odometry, 'odom', self.odom_callback, qos)
-        self.create_subscription(LaserScan, 'scan', self.laser_callback, qos)
+        self.create_subscription(Imu, '/imu', self.imu_callback, qos)
+        self.create_subscription(Odometry, '/odom', self.odom_callback, qos)
+        self.create_subscription(LaserScan, '/scan', self.laser_callback, qos)
+
         
         # Create a timer that calls the timer_callback every 0.1 seconds
         self.create_timer(0.1, self.timer_callback)
@@ -75,16 +81,15 @@ class motion_executioner(Node):
         ranges = laser_msg.ranges
         angle_increment = laser_msg.angle_increment
         stamp = Time.from_msg(laser_msg.header.stamp).nanoseconds
-        self.laser_logger.log_values([ranges, angle_increment, stamp])
+        self.laser_logger.log_values([angle_increment, stamp])
+        self.laser_range_logger.log_values(ranges.tolist())
         self.laser_initialized = True
 
     def timer_callback(self):
         if self.odom_initialized and self.laser_initialized and self.imu_initialized:
             self.successful_init = True
-            
         if not self.successful_init:
             return
-        
         cmd_vel_msg = Twist()
         
         if self.type == CIRCLE:
@@ -99,20 +104,19 @@ class motion_executioner(Node):
         else:
             print("type not set successfully, 0: CIRCLE 1: SPIRAL and 2: ACCELERATED LINE")
             raise SystemExit 
-
         self.vel_publisher.publish(cmd_vel_msg)
 
     def make_circular_twist(self):
         msg = Twist()
         msg.linear.x = 0.2  # Constant forward speed
-        msg.angular.z = 0.2  # Constant angular speed for circular motion
+        msg.angular.z = 1.0  # Constant angular speed for circular motion
         return msg
 
     def make_spiral_twist(self):
         self.radius_ += 0.01  # Increase radius for spiral motion
         msg = Twist()
-        msg.linear.x = self.radius_ * 0.2  # Forward speed proportional to radius
-        msg.angular.z = 0.2  # Constant angular speed
+        msg.linear.x = self.radius_ * 0.5  # Forward speed proportional to radius
+        msg.angular.z = 0.5  # Constant angular speed
         return msg
 
     def make_acc_line_twist(self):

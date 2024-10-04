@@ -66,7 +66,9 @@ class FileReader:
                     row.append(float(val.strip()))
 
                 table.append(row)
-
+        # save ranges differently
+        if headers[0] == "ranges":
+            table = [[row] for row in table]
         return headers, table
 
 
@@ -76,7 +78,10 @@ def euler_from_quaternion(quat):
     Convert quaternion (w in last place) to euler roll, pitch, yaw.
     quat = [x, y, z, w]
     """
-    x, y, z, w = quat
+    x = quat.x
+    y = quat.y
+    z = quat.z
+    w = quat.w
 
     # Roll (x-axis rotation)
     sinr_cosp = 2 * (w * x + y * z)
