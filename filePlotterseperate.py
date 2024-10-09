@@ -8,12 +8,6 @@ from utilities import FileReader
 import csv
 import os
 
-def read_csv_info(csv_file):
-    with open(csv_file, 'r') as f:
-        reader = csv.reader(f)
-        info = next(reader)[0]  # Read only the first element of the first row
-    return info
-
 def format_title(filename):
     base_name = os.path.basename(filename)
     parts = base_name.split('_')
@@ -21,9 +15,8 @@ def format_title(filename):
         return f"{parts[0].title()} Data {parts[-1].split('.')[0].title()}"
     return base_name.title()
 
-def plot_errors(filename, csv_file):
+def plot_errors(filename):
     headers, values = FileReader(filename).read_file()
-    csv_info = read_csv_info(csv_file)
     
     time_list = []
     first_stamp = values[0][-1]
@@ -62,7 +55,7 @@ def plot_errors(filename, csv_file):
             time_list.append(val[-1] - first_stamp)
 
         num_subplots = len(headers) - 1  # Exclude timestamp column
-        fig, axs = plt.subplots(num_subplots, 1, figsize=(12, 4 * num_subplots), sharex=True)
+        fig, axs = plt.subplots(num_subplots, 1, figsize=(10, 3 * num_subplots), sharex=True)
         fig.suptitle(format_title(filename))
 
         for i in range(num_subplots):
@@ -84,7 +77,6 @@ def plot_errors(filename, csv_file):
             axs[i].grid(True)
 
         axs[-1].set_xlabel('Time (s)')
-        plt.tight_layout()
         plt.show()
 
 import argparse
@@ -92,14 +84,12 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some files.')
     parser.add_argument('--files', nargs='+', required=True, help='List of files to process')
-    parser.add_argument('--csvs', nargs='+', required=True, help='List of CSV files for axis and title information')
-    
+ 
     args = parser.parse_args()
     
     print("plotting the files", args.files)
 
     filenames = args.files
-    csv_files = args.csvs
 
-    for filename, csv_file in zip(filenames, csv_files):
-        plot_errors(filename, csv_file)
+    for filename in filenames:
+        plot_errors(filename)
