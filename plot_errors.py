@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 from utilities import FileReader
+import os
 
 
 
-
-def plot_errors(filename):
+def plot_pose(filename):
     
-    headers, values=FileReader(filename).read_file()
+    headers, values=FileReader(os.path.join(os.getcwd(), filename)).read_file()
     
     time_list=[]
     
@@ -34,8 +34,30 @@ def plot_errors(filename):
 
     plt.show()
     
-    
 
+def plot_errors(filename):
+    
+    headers, values=FileReader(os.path.join(os.getcwd(), filename)).read_file()
+    
+    time_list=[]
+    
+    first_stamp=values[0][-1]
+    
+    for val in values:
+        time_list.append(val[-1] - first_stamp)
+
+
+    fig, axes = plt.subplots(1,1, figsize=(14,6))
+    
+    axes.set_title("each individual error")
+    for i in range(0, len(headers) - 1):
+        axes.plot(time_list, [lin[i] for lin in values], label= headers[i]+ " linear")
+
+    axes.legend()
+    axes.grid()
+
+    plt.show()
+    
 
 
 

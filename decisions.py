@@ -6,7 +6,7 @@ import sys
 from utilities import euler_from_quaternion, calculate_angular_error, calculate_linear_error
 from pid import PID_ctrl
 
-from rclpy import init, spin, spin_once
+from rclpy import init, spin, spin_once, shutdown
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
@@ -37,12 +37,12 @@ class decision_maker(Node):
         # FIXME Part 5: Tune your parameters here
     
         if motion_type == POINT_PLANNER:
-            self.controller=controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            self.controller=controller(klp=0.4, klv=0.5, kap=0.8, kav=0.6)
             self.planner=planner(POINT_PLANNER)    
     
     
         elif motion_type==TRAJECTORY_PLANNER:
-            self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            self.controller=trajectoryController(klp=2, klv=0.1, kap=1.2, kav=0.6)
             self.planner=planner(TRAJECTORY_PLANNER)
 
         else:
@@ -87,7 +87,7 @@ class decision_maker(Node):
             self.controller.PID_linear.logger.save_log()
             
             #TODO Part 3: exit the spin
-            rclpy.shutdown()
+            shutdown()
         
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
 
@@ -111,7 +111,7 @@ def main(args=None):
     # TODO Part 4: instantiate the decision_maker with the proper parameters for moving the robot
     if args.motion.lower() == "point":
         DM = decision_maker(publisher_msg=Twist, publishing_topic="/cmd_vel", 
-                            qos_publisher=odom_qos, goalPoint=[1,1], motion_type=POINT_PLANNER)
+                            qos_publisher=odom_qos, goalPoint=[2,2], motion_type=POINT_PLANNER)
     elif args.motion.lower() == "trajectory":
         DM = decision_maker(publisher_msg=Twist, publishing_topic="/cmd_vel", 
                             qos_publisher=odom_qos, goalPoint=None, motion_type=TRAJECTORY_PLANNER)

@@ -30,7 +30,7 @@ class planner:
         # FIXME Choose
         # Option 0: y = x^2
         # Option 1: sigma = 2 / (1+e^(-2x)) - 1
-        traj_choice = 0
+        traj_choice = 1
 
         trajectory_points = []
 

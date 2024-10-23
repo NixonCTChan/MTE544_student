@@ -45,7 +45,7 @@ class localization(Node):
         x = pose_msg.pose.pose.position.x
         y = pose_msg.pose.pose.position.y
         orientation = pose_msg.pose.pose.orientation   # Given as quaternion
-        theta = euler_from_quaternion(orientation)[2]  # Convert quaternion to Euler angles and extract yaw (theta)
+        theta = euler_from_quaternion(orientation)  # Convert quaternion to Euler angles and extract yaw (theta)
         
         self.pose=[x, y, theta, pose_msg.header.stamp]
         

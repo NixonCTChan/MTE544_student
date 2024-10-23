@@ -16,11 +16,11 @@ class controller:
         # TODO Part 5 and 6: Modify the below lines to test your PD, PI, and PID controller
 
         # CHANGE FOR EACH TEST: P=0; PD=1; PI=2; PID=3
-        controller_choice = P
+        controller_choice = PID
 
         if controller_choice == P:
             self.PID_linear = PID_ctrl(P, klp, klv, kli, filename_="P_linear.csv")
-            self.PID_angular = PID_ctrl(P, kap, kav, kai, filename_="p_angular.csv")
+            self.PID_angular = PID_ctrl(P, kap, kav, kai, filename_="P_angular.csv")
         elif controller_choice == PD:
             self.PID_linear = PID_ctrl(PD, klp, klv, kli, filename_="PD_linear.csv")
             self.PID_angular = PID_ctrl(PD, kap, kav, kai, filename_="PD_angular.csv")
@@ -44,11 +44,11 @@ class controller:
         # TODO Part 4: Add saturation limits for the robot linear and angular velocity
         # FIXME CHANGE FOR IN PERSON!
         # FOR SIMU
-        max_linear_vel = 0.22  # Define the maximum linear velocity
-        max_angular_vel = 2.84  # Define the maximum angular velocity
+        # max_linear_vel = 0.22  # Define the maximum linear velocity
+        # max_angular_vel = 2.84  # Define the maximum angular velocity
         # FOR IN PERSON
-        #max_linear_vel = 0.31  # Define the maximum linear velocity
-        #max_angular_vel = 1.90  # Define the maximum angular velocity
+        max_linear_vel = 0.31  # Define the maximum linear velocity
+        max_angular_vel = 1.90  # Define the maximum angular velocity
 
         linear_vel = max_linear_vel if linear_vel > max_linear_vel else linear_vel
         angular_vel= max_angular_vel if angular_vel > max_angular_vel else angular_vel
@@ -68,7 +68,7 @@ class trajectoryController(controller):
         
         finalGoal=listGoals[-1]
         
-        e_lin=calculate_linear_error(pose, finalGoal)
+        e_lin=calculate_linear_error(pose, goal)
         e_ang=calculate_angular_error(pose, goal)
 
         
@@ -78,11 +78,11 @@ class trajectoryController(controller):
         # TODO Part 5: Add saturation limits for the robot linear and angular velocity
         # FIXME CHANGE FOR IN PERSON!
         # FOR SIMU
-        max_linear_vel = 0.22  # Define the maximum linear velocity
-        max_angular_vel = 2.84  # Define the maximum angular velocity
+        # max_linear_vel = 0.22  # Define the maximum linear velocity
+        # max_angular_vel = 2.84  # Define the maximum angular velocity
         # FOR IN PERSON
-        #max_linear_vel = 0.31  # Define the maximum linear velocity
-        #max_angular_vel = 1.90  # Define the maximum angular velocity
+        max_linear_vel = 0.31  # Define the maximum linear velocity
+        max_angular_vel = 1.90  # Define the maximum angular velocity
 
         linear_vel = max_linear_vel if linear_vel > max_linear_vel else linear_vel
         angular_vel= max_angular_vel if angular_vel > max_angular_vel else angular_vel

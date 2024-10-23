@@ -134,6 +134,7 @@ def calculate_linear_error(current_pose, goal_pose):
     
     # Compute the linear error using the Euclidean distance formula
     error_linear = math.sqrt((goal_x - current_x) ** 2 + (goal_y - current_y) ** 2)
+    print(f"error:{error_linear} goal: {goal_pose} curr: {current_pose}")
 
     return error_linear
 
