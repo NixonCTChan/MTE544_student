@@ -35,7 +35,7 @@ class localization(Node):
         if type==rawSensors:
             self.initRawSensors()
         elif type==kalmanFilter:
-            self.initKalmanfilter(dt)
+            self.initKalmanfilter(0.15)
         else:
             print("We don't have this type for localization", sys.stderr)
             return  
@@ -49,23 +49,11 @@ class localization(Node):
         x = np.zeros(6)
         
         # Process noise covariance
-        Q = np.diag([
-            0.5,    # x position
-            0.5,    # y position
-            0.5,    # heading
-            0.5,    # angular velocity
-            0.5,    # linear velocity
-            0.5     # acceleration
-        ])
+        Q = np.eye(6) * 0.25
         
         # Measurement noise covariance
-        R = np.diag([
-            0.5,    # velocity measurement
-            0.5,    # angular velocity measurement
-            0.5,    # ax measurement
-            0.5     # ay measurement
-        ])
-        
+        R = np.eye(4) * 0.25
+
         # Initial state covariance
         P = np.eye(6) * 1.0
         
