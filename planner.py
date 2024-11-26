@@ -1,4 +1,3 @@
-
 from mapUtilities import *
 from a_star import *
 
@@ -26,45 +25,47 @@ class planner:
         return endPose
 
     def initTrajectoryPlanner(self):
-
-
-        # TODO PART 5 Create the cost-map, the laser_sig is 
-        # the standard deviation for the gausiian for which
-        # the mean is located on the occupant grid. 
-        self.m_utilites=mapManipulator(laser_sig=...)
+        # Create the cost-map with a standard deviation for the Gaussian
+        # Using a reasonable default standard deviation (e.g., 1.0)
+        self.m_utilites = mapManipulator(laser_sig=1.0)
             
-        self.costMap=self.m_utilites.make_likelihood_field()
+        self.costMap = self.m_utilites.make_likelihood_field()
         
 
     def trajectory_planner(self, startPoseCart, endPoseCart):
-
-
-        # This is to convert the cartesian coordinates into the 
-        # the pixel coordinates of the map image, remmember,
-        # the cost-map is in pixels. You can by the way, convert the pixels
-        # to the cartesian coordinates and work by that index, the a_star finds
-        # the path regardless. 
-        startPose=self.m_utilites.position_2_cell(startPoseCart)
-        endPose=self.m_utilites.position_2_cell(endPoseCart)
+        # Convert cartesian coordinates to pixel coordinates
+        startPose = self.m_utilites.position_2_cell(startPoseCart)
+        endPose = self.m_utilites.position_2_cell(endPoseCart)
         
-        # TODO PART 5 convert the cell pixels into the cartesian coordinates
+        # Use A* search to find the path in the cost map
+        # Using Euclidean heuristic for more natural path
+        Path = search(self.costMap, startPose, endPose, heuristic='euclidean')
         
-        Path = list(map(...))
+        # Convert pixel coordinates back to cartesian coordinates
+        # Convert each pixel coordinate to its cartesian representation
+        cartesianPath = list(map(self.m_utilites.cell_2_position, Path))
 
-
-
-        # TODO PART 5 return the path as list of [x,y]
-        return ...
-
-
+        # Return path as list of [x,y] in cartesian coordinates
+        return cartesianPath
 
 
 if __name__=="__main__":
-
-    m_utilites=mapManipulator()
+    # Example usage for testing
+    m_utilites = mapManipulator()
     
-    map_likelihood=m_utilites.make_likelihood_field()
+    map_likelihood = m_utilites.make_likelihood_field()
 
-    # you can use this part of the code to test your 
-    # search algorithm regardless of the ros2 hassles
+    # You can use this part of the code to test your 
+    # search algorithm regardless of the ROS2 complexities
+
+    # Create a trajectory planner
+    trajectory_planner = planner(TRAJECTORY_PLANNER)
     
+    # Define start and end poses (cartesian coordinates)
+    start_pose = [0, 0]  # Example start point
+    end_pose = [10, 10]  # Example end point
+    
+    # Plan trajectory
+    path = trajectory_planner.plan(start_pose, end_pose)
+    
+    print("Planned Path:", path)

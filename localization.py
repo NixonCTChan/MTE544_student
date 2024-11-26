@@ -71,18 +71,16 @@ class localization(Node):
                         0,
                         0])        
             
-            # TODO PART 5 Bonus put the Q and R matrices
-            # that you conclude from lab Three
-            Q=...
-            R=...
-            P=...
+            Q=np.eye(6) * 0.1
+            R=np.eye(4) * 0.1
+            P=np.eye(6) * 1.0
                         
             self.kf=kalman_filter(P,Q,R, x)
             
             self.kalmanInitialized = True
 
         
-        dt = time.time() - self.timelast
+        dt = time.time() - self.timelast # change here dt
 
         self.timelast=time.time()
 
