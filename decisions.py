@@ -46,7 +46,7 @@ class decision_maker(Node):
         self.reachThreshold=0.1
 
         # TODO PART 5 your localization type
-        self.localizer=localization(kalmanFilter)
+        self.localizer=localization(rawSensors, loggerHeaders=["odom_x", "odom_y", "odom_th", "timestamp"])
 
 
         

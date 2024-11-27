@@ -27,7 +27,7 @@ class planner:
     def initTrajectoryPlanner(self):
         # Create the cost-map with a standard deviation for the Gaussian
         # Using a reasonable default standard deviation (e.g., 1.0)
-        self.m_utilites = mapManipulator(laser_sig=1.0)
+        self.m_utilites = mapManipulator(laser_sig=0.3)
             
         self.costMap = self.m_utilites.make_likelihood_field()
         
@@ -40,6 +40,8 @@ class planner:
         # Use A* search to find the path in the cost map
         # Using Euclidean heuristic for more natural path
         Path = search(self.costMap, startPose, endPose, heuristic='euclidean')
+        
+        plot_maze_with_path(self.costMap, Path)
         
         # Convert pixel coordinates back to cartesian coordinates
         # Convert each pixel coordinate to its cartesian representation
