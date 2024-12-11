@@ -53,7 +53,7 @@ class planner:
             sample_points, roadmap = prm_graph(startPose, 
                                             endPose, 
                                             self.obstaclesListCell, 
-                                            0.1, # assume the robot has a radius of 10 cm
+                                            0.2, # assume the robot has a radius of 20 cm
                                             m_utilities=self.m_utilities)
             
             # Perform path search using search_PRM

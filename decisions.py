@@ -159,7 +159,7 @@ def main(args=None):
     odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
     # Set the desired planner here
-    DM=decision_maker(Twist, "/cmd_vel", 10, motion_type=PRM_PLANNER)
+    DM=decision_maker(Twist, "/cmd_vel", 10, motion_type=ASTAR_PLANNER)
 
     try:
         spin(DM)
