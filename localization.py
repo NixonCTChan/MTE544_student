@@ -68,17 +68,16 @@ class localization(Node):
                         0,
                         0])        
 
-            Q=0.1*np.eye(6)
-            R=0.4*np.eye(4)
-            P=Q.copy()
+            Q=1*np.eye(6)
+            R=0.001*np.eye(4)
+            P=1.0*np.eye(6)
             
             self.kf=kalman_filter(P,Q,R, x)
             self.kalmanInitialized = True
         
-        dt = time.time() - self.timelast
-
-        self.timelast=time.time()
-
+        current_time = Time.from_msg(imu_msg.header.stamp).nanoseconds
+        dt = (current_time - self.timelast) * 1e-9 
+        self.timelast = current_time
 
         z=np.array([odom_msg.twist.twist.linear.x,
                     odom_msg.twist.twist.angular.z,

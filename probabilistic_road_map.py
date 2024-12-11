@@ -28,9 +28,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import KDTree
 from mapUtilities import *
-
+import rclpy
 # Parameters of PRM
-N_SAMPLE = 800  # number of sample_points
+N_SAMPLE = 1500  # number of sample_points
 N_KNN = 10  # number of edge from one sampled point (one node)
 MAX_EDGE_LEN = 3  # Maximum edge length, in [m]
 
@@ -52,9 +52,10 @@ def prm_graph(start, goal, obstacles_list, robot_radius, *, rng=None, m_utilitie
     :pram m_utilities: when using a map, pass the map utilies that contains the costmap information
     :return: roadmap (and list of sample points if using the map)
     """
-
+    if m_utilities is None:
+        m_utilities = mapManipulator(laser_sig=0.4)
     print("Generating PRM graph")
-
+    print(f"Obstacles: {obstacles_list}")
     obstacle_kd_tree = KDTree(obstacles_list)
 
     # By default, we use the set maximum edge length
@@ -65,6 +66,7 @@ def prm_graph(start, goal, obstacles_list, robot_radius, *, rng=None, m_utilitie
         # Therefore, when using the map, the radius and edge length need to be adjusted for the resolution of the cell positions
         # Hint: in the map utilities there is the resolution stored
         resolution = m_utilities.getResolution()
+        print(f"Resolution: {resolution}")
         robot_radius /= resolution
         max_edge_len /= resolution
 
@@ -167,8 +169,13 @@ def generate_sample_points(start, goal, rr, obstacles_list, obstacle_kd_tree, rn
 
     min_x, min_y = np.min(obstacles_list, axis=0)
     max_x, max_y = np.max(obstacles_list, axis=0)
-
+    print(f"Min: {min_x,min_y}")
+    print(f"Max: {max_x,max_y}")
+    step = 0
     while len(sample_x) < N_SAMPLE:
+        step += 1
+        if step % 100 == 0:
+            print(f"Processing: {step}")
         rx = rng.uniform(min_x, max_x)
         ry = rng.uniform(min_y, max_y)
         
@@ -209,6 +216,8 @@ def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree, max_edge_len):
         return True
 
     steps = int(distance / rr)
+    if steps==0:
+        steps=1
     for i in range(steps + 1):
         x = sx + i * dx / steps
         y = sy + i * dy / steps
@@ -274,6 +283,7 @@ def plot_road_map(road_map, sample_points):
 
 
 def main(rng=None):
+    rclpy.init()
     print(__file__ + " start!!")
 
     # start and goal position
@@ -281,7 +291,7 @@ def main(rng=None):
     sy = 10.0  # [m]
     gx = 50.0  # [m]
     gy = 50.0  # [m]
-    robot_size = 5.0  # [m]
+    robot_size = 2.0  # [m]
 
     ox = []
     oy = []

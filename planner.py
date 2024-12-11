@@ -52,8 +52,8 @@ class planner:
             # Generate the PRM graph
             sample_points, roadmap = prm_graph(startPose, 
                                             endPose, 
-                                            self.obstaclesList, 
-                                            0.5, # assume the robot has a radius of 0.5 m
+                                            self.obstaclesListCell, 
+                                            0.08, # assume the robot has a radius of 0.5 m
                                             m_utilities=self.m_utilities)
             
             # Perform path search using search_PRM
@@ -93,9 +93,11 @@ class planner:
     
 
 if __name__=="__main__":
-
+    import rclpy
+    rclpy.init()
     m_utilities=mapManipulator()
     
     map_likelihood=m_utilities.make_likelihood_field()
     
-    # You can test your code here...
+    planner_1 = planner(PRM_PLANNER)
+    planner_1.plan((-2, -2), (6, 1))
