@@ -205,17 +205,93 @@ def search_PRM(points, prm, start, end):
         :return: path as tuples from the given start to the given end
         :return:
     """
-    # Create start and end node with initized values for g, h and f
-    start_idx = points.index(tuple(start))
+    # Create start and end node with initialized values for g, h and f
+    start_idx = points.index(start)
     start_node = Node(None, start_idx)
     start_node.g = start_node.h = start_node.f = 0
 
-    end_idx = points.index(tuple(end))
+    end_idx = points.index(end)
     end_node = Node(None, end_idx)
     end_node.g = end_node.h = end_node.f = 0
 
-    path_points = []
+    # Initialize yet_to_visit and visited dictionaries
+    yet_to_visit_dict = {}
+    visited_dict = {}
 
-    ...
+    # Add the start node
+    yet_to_visit_dict[start_node.position] = start_node
     
-    return path_points
+    # Adding a stop condition to avoid infinite loops
+    outer_iterations = 0
+    max_iterations = len(points) ** 2
+
+    # Loop until we find the end or exhaust all possibilities
+    while len(yet_to_visit_dict) > 0:
+        outer_iterations += 1
+        
+        # Get the current node with lowest f cost
+        current_node_position = -999
+        current_node = Node(None, current_node_position)
+        current_node.f = float('inf')
+        for i_position in yet_to_visit_dict.keys():
+            i_node = yet_to_visit_dict[i_position]
+            if i_node.f < current_node.f:
+                current_node = i_node
+
+        # Check for max iterations
+        if outer_iterations > max_iterations:
+            print("Giving up on pathfinding - too many iterations")
+            return []
+
+        # Remove current node from yet_to_visit and mark as visited
+        yet_to_visit_dict.pop(current_node.position)
+        visited_dict[current_node.position] = True
+
+        # Check if goal is reached
+        if current_node.position == end_node.position:
+            # Reconstruct and return the path
+            path = []
+            while current_node is not None:
+                path.append(points[current_node.position])
+                current_node = current_node.parent
+            return path[::-1]
+
+        # Generate children (neighbors in the PRM)
+        # Neighbors are the connected points in the PRM for the current point
+        neighbors = prm[current_node.position]
+        children = []
+        for neighbor_idx in neighbors:
+            # Skip if already visited
+            if visited_dict.get(neighbor_idx, False):
+                continue
+            
+            child = Node(current_node, neighbor_idx)
+            children.append(child)
+
+        # Process children
+        for child in children:
+            # Create the f, g, and h values
+            # g is the actual distance from start to current node
+            child.g = current_node.g + sqrt(
+                ((points[child.position][0] - points[current_node.position][0]) ** 2) + 
+                ((points[child.position][1] - points[current_node.position][1]) ** 2)
+            )
+            
+            # h is the estimated distance from child to end (heuristic)
+            child.h = sqrt(
+                ((points[child.position][0] - points[end_idx][0]) ** 2) + 
+                ((points[child.position][1] - points[end_idx][1]) ** 2)
+            )
+
+            child.f = child.g + child.h
+
+            # Check if child is already in yet_to_visit with a lower g cost
+            child_node_in_yet_to_visit = yet_to_visit_dict.get(child.position, False)
+            if (child_node_in_yet_to_visit is not False) and (child.g >= child_node_in_yet_to_visit.g):
+                continue
+
+            # Add the child to the yet_to_visit list
+            yet_to_visit_dict[child.position] = child
+
+    # No path found
+    return []
